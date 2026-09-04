@@ -10,6 +10,189 @@
 <style>
 :root{--gold:#d4af37;--gold2:#f4d77d;--black:#070707;--card:#111111;--text:#f5f0df;--muted:#b8b2a5}
 *{box-sizing:border-box} html{scroll-behavior:smooth}
+  <section class="rating-section">
+  <h2>Rate Your Experience</h2>
+  <p class="rating-subtitle">How was your experience at New Kesar Beauty Parlour?</p>
+
+  <div class="stars" id="stars">
+    <span data-rating="1">★</span>
+    <span data-rating="2">★</span>
+    <span data-rating="3">★</span>
+    <span data-rating="4">★</span>
+    <span data-rating="5">★</span>
+  </div>
+
+  <p id="ratingText">Tap a star to rate us</p>
+
+  <textarea id="review" placeholder="Write your review..."></textarea>
+
+  <button onclick="submitReview()">Submit Review</button>
+
+  <div class="rating-result">
+    <strong id="averageRating">5.0</strong>
+    <span>★★★★★</span>
+    <small id="reviewCount">Based on 0 reviews</small>
+  </div>
+</section>
+
+<style>
+.rating-section {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 30px;
+  text-align: center;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #fff7fa, #fff);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.10);
+  font-family: Arial, sans-serif;
+}
+
+.rating-section h2 {
+  margin-bottom: 8px;
+  color: #a7194b;
+  font-size: 28px;
+}
+
+.rating-subtitle {
+  color: #777;
+}
+
+.stars {
+  margin: 20px 0 8px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.stars span {
+  font-size: 45px;
+  color: #ddd;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.stars span:hover,
+.stars span.active {
+  color: #f5b301;
+  transform: scale(1.12);
+}
+
+#ratingText {
+  color: #a7194b;
+  font-weight: bold;
+}
+
+textarea {
+  width: 100%;
+  height: 100px;
+  padding: 14px;
+  margin: 15px 0;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  resize: none;
+  box-sizing: border-box;
+}
+
+.rating-section button {
+  background: #a7194b;
+  color: white;
+  border: none;
+  padding: 13px 28px;
+  border-radius: 25px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.rating-section button:hover {
+  background: #86133c;
+}
+
+.rating-result {
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.rating-result strong {
+  font-size: 30px;
+  color: #a7194b;
+}
+
+.rating-result span {
+  color: #f5b301;
+  font-size: 22px;
+}
+
+.rating-result small {
+  display: block;
+  color: #777;
+  margin-top: 5px;
+}
+</style>
+
+<script>
+let selectedRating = 0;
+let ratings = JSON.parse(localStorage.getItem("kesarRatings")) || [];
+
+const stars = document.querySelectorAll(".stars span");
+
+stars.forEach(star => {
+  star.addEventListener("click", () => {
+    selectedRating = Number(star.dataset.rating);
+
+    stars.forEach(s => {
+      s.classList.toggle(
+        "active",
+        Number(s.dataset.rating) <= selectedRating
+      );
+    });
+
+    document.getElementById("ratingText").textContent =
+      selectedRating + " out of 5 stars";
+  });
+});
+
+function submitReview() {
+  if (selectedRating === 0) {
+    alert("Please select a star rating.");
+    return;
+  }
+
+  const review = document.getElementById("review").value.trim();
+
+  ratings.push({
+    rating: selectedRating,
+    review: review,
+    date: new Date().toLocaleDateString()
+  });
+
+  localStorage.setItem("kesarRatings", JSON.stringify(ratings));
+
+  updateRating();
+
+  alert("Thank you for rating New Kesar Beauty Parlour! ❤️");
+
+  document.getElementById("review").value = "";
+  selectedRating = 0;
+
+  stars.forEach(s => s.classList.remove("active"));
+  document.getElementById("ratingText").textContent =
+    "Tap a star to rate us";
+}
+
+function updateRating() {
+  if (ratings.length === 0) return;
+
+  const total = ratings.reduce((sum, item) => sum + item.rating, 0);
+  const average = (total / ratings.length).toFixed(1);
+
+  document.getElementById("averageRating").textContent = average;
+  document.getElementById("reviewCount").textContent =
+    "Based on " + ratings.length + " reviews";
+}
+
+updateRating();
+</script>
 body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--black);color:var(--text)}
 h1,h2,h3{font-family:Georgia,'Times New Roman',serif}
 a{text-decoration:none;color:inherit}
